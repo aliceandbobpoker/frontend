@@ -1,0 +1,1 @@
+declare module '@iden3/binfileutils';
