@@ -601,9 +601,9 @@ export const PublicCards: React.FC<PublicCardsProps> = ({ data, id, type, positi
 
     const potString = `Pot: ${data.formatAmount(data.pot)}`;
 
-    if (revealedCards.length === 0) {
-      return <div></div>;
-    }
+    // if (revealedCards.length === 0) {
+    //   return <div></div>;
+    // }
   
     return <div className="table-circle v2" style={{ height: 60 ,
     width: 219,
