@@ -801,6 +801,7 @@ const GamePage: React.FC<GamePageProps> = ({ packageId, privateState, formatLink
       }
       const allPlayerEvents = [];
       var alert = null;
+      const isFirstSnapshot = eventCursorRef.current === null;
       while (true) {
         try {
           let useCursor = eventCursorRef.current;
@@ -812,13 +813,13 @@ const GamePage: React.FC<GamePageProps> = ({ packageId, privateState, formatLink
               }
             },
             cursor: useCursor,
-            order: "ascending",
+            order: (isFirstSnapshot ?  "descending" : "ascending"),
           }
           // @ts-ignore
           const paginatedEvents = await client.queryEvents(queryParams);
           const events = paginatedEvents.data;
   
-          eventCursorRef.current = paginatedEvents.nextCursor;
+          eventCursorRef.current = (isFirstSnapshot && paginatedEvents.data.length > 0) ? (paginatedEvents.data[0].id) : paginatedEvents.nextCursor;
           for (let event of events) {
             const eventData: any = event['parsedJson'];
             const parsedGameEvent = parseGameEvent(event['type'], packageId);
@@ -842,7 +843,7 @@ const GamePage: React.FC<GamePageProps> = ({ packageId, privateState, formatLink
               }
             }
           }
-          if (!paginatedEvents.hasNextPage) {
+          if (!paginatedEvents.hasNextPage || (isFirstSnapshot && allPlayerEvents.length > 200)) {
             break;
           }
         }
@@ -857,7 +858,6 @@ const GamePage: React.FC<GamePageProps> = ({ packageId, privateState, formatLink
           setAlert(alert);
         }
         handleNewEvents(allPlayerEvents);
-
       }
     }
 
