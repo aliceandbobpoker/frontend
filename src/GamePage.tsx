@@ -88,16 +88,16 @@ export const getZkey = async (key: string, onProgress: (progress: FetchProgressD
   if (zkey === undefined) {
     var pathToFetch;
     if (key === 'zero_encrypt_0001') {
-      pathToFetch = `zkey/${key.replace('_0001', '')}`;
+      pathToFetch = `/zkey/${key.replace('_0001', '')}`;
     } else if (key === 'encrypt_shuffle_0001') {
-      pathToFetch = `zkey/${key.replace('_0001', '')}`;
+      pathToFetch = `/zkey/${key.replace('_0001', '')}`;
     }
     else {
       pathToFetch = `/${key}.zkey`;
     }
     var headers;
     if (process.env.NODE_ENV === 'development') {
-      pathToFetch = `http://localhost:8080/${pathToFetch}`;
+      pathToFetch = `http://localhost:8080${pathToFetch}`;
       headers = {};
     } else {
       headers = {
