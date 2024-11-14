@@ -800,26 +800,27 @@ const GamePage: React.FC<GamePageProps> = ({ packageId, privateState, formatLink
         return;
       }
       const allPlayerEvents = [];
-      var alert = null;
       const isFirstSnapshot = eventCursorRef.current === null;
+      let isFirstLoop = true;
+      let useCursor = eventCursorRef.current;
       while (true) {
         try {
-          let useCursor = eventCursorRef.current;
           const queryParams = {
             query: {  
               MoveModule: {
                 package: packageId,
                 module: 'game'
-              }
-            },
+              }},
             cursor: useCursor,
             order: (isFirstSnapshot ?  "descending" : "ascending"),
           }
           // @ts-ignore
           const paginatedEvents = await client.queryEvents(queryParams);
           const events = paginatedEvents.data;
-  
-          eventCursorRef.current = (isFirstSnapshot && paginatedEvents.data.length > 0) ? (paginatedEvents.data[0].id) : paginatedEvents.nextCursor;
+          useCursor = paginatedEvents.nextCursor;
+          if (isFirstSnapshot && isFirstLoop && events.length > 0) {
+            eventCursorRef.current = events[0].id;
+          }
           for (let event of events) {
             const eventData: any = event['parsedJson'];
             const parsedGameEvent = parseGameEvent(event['type'], packageId);
@@ -832,18 +833,12 @@ const GamePage: React.FC<GamePageProps> = ({ packageId, privateState, formatLink
                 timestamp: event['timestampMs'] ? parseInt(event['timestampMs']) : 0,
                 eventSeq: event['id']['eventSeq'] ? parseInt(event['id']['eventSeq']) : 0,
               }
-  
-              alert = {
-                event: playerEvent,
-                digest: event['id']['txDigest']
-              }
-  
               if (gameEventsRef.current.filter((e) => e.digest === event['id']['txDigest'] && e.eventSeq.toString() === event['id']['eventSeq']).length === 0) {
                 allPlayerEvents.push(playerEvent);
               }
             }
           }
-          if (!paginatedEvents.hasNextPage || (isFirstSnapshot && allPlayerEvents.length > 200)) {
+          if (!paginatedEvents.hasNextPage || (isFirstSnapshot && allPlayerEvents.length > 300)) {
             break;
           }
         }
@@ -851,10 +846,21 @@ const GamePage: React.FC<GamePageProps> = ({ packageId, privateState, formatLink
           console.log("error fetching events: " + err);
           break;
         }
+        isFirstLoop = false;
+      }
+      if (!isFirstSnapshot) {
+        eventCursorRef.current = useCursor;
+      } else {
+        allPlayerEvents.reverse();
       }
       if (allPlayerEvents.length > 0) {
         loadState(id);
-        if (alert && gameEventsRef.current.length > 0) {
+        if (gameEventsRef.current.length > 0) {
+          const lastEvent = allPlayerEvents[allPlayerEvents.length - 1];
+          const alert = {
+            event: lastEvent,
+            digest: lastEvent.digest
+          };
           setAlert(alert);
         }
         handleNewEvents(allPlayerEvents);
