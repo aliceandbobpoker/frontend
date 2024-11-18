@@ -225,7 +225,7 @@ function Row(props: { isOpen: boolean, idx: string, events: PlayerEvent[],  form
   const getListItemText = (events: PlayerEvent[]) => {
     const formattedEvents = formatEvents(events);
     if (formattedEvents.length === 0) {
-      return null;``
+      return null;
     }
 
     // make bold if new hand or reveal event
