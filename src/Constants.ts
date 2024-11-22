@@ -5,7 +5,7 @@ import { SuiType } from './SuiType';
 export const ADMIN_ADDRESS = '0x70cba2254a6c73a68e2ad3f079e7f14c4233d5dfb4dc0f3c519321c843903cab';
 const LOCALNET_PACKAGE_ID = '0x123';
 const MAINNET_PACKAGE_ID = '0x456';
-const DEVNET_PACKAGE_ID = '0x11816c1b1672c8d1c775fd9ce1a1a70ff066fa8fb68882e74e562308bdf29ebc';
+const DEVNET_PACKAGE_ID = '0xdc101917a415bc3833471d7b1147b724b187f75b5a148d660795492d1e06469a';
 
 const formatLink = (key: string, suiType: SuiType, network: string) => {
 	if (network === 'localnet') {
